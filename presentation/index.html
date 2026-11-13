@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Freecash asks before it gives</title>
+<meta name="description" content="Case study for Almedia, Director of Product Design: one pain point in Freecash's first session and the Next reward card.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens: subset of assets/tokens.css (Freecash, Dimi's semantic layer) */
+:root{
+  --main-25:#01D6761A;--main-400:#2CFC9E;--main-500:#01D676;--main-700:#009653;--main-800:#067544;
+  --gb-25:#CCCCDD;--gb-50:#A9A9CA;--gb-100:#7D7D9E;--gb-200:#525266;--gb-300:#33334D;--gb-400:#2F3043;
+  --gb-500:#252539;--gb-600:#212134;--gb-700:#1D1E30;--gb-900:#141523;
+  --yellow-500:#FEE811;--yellow-700:#CCB800;--yellow-900:#887B00;
+  --orange-25:#FD97271A;--orange-500:#FD9727;--orange-800:#A85801;
+  --info-400:#29BFFA;--info-25:#059FDB1A;--error-400:#F04343;--error-25:#DE2C2C1A;
+  --surface:var(--gb-900);--sheet:var(--gb-700);--tile:var(--gb-600);--card:var(--gb-500);
+  --text:#FFFFFF;--text-2:var(--gb-50);--text-3:var(--gb-100);
+  --stroke:var(--gb-300);--stroke-2:var(--gb-400);
+  --glow-action:var(--main-25);
+  --r-s:4px;--r-m:8px;--r-l:12px;--r-xl:20px;--r-2xl:28px;--r-full:999px;
+  --font:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --s:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--surface);color:var(--text);font-family:var(--font);letter-spacing:.02em;-webkit-font-smoothing:antialiased;overflow:hidden}
+img{display:block;max-width:100%}
+a{color:var(--main-500)}
+#deck{position:fixed;inset:0;overflow:hidden;background:radial-gradient(1200px 600px at 50% -10%,#00361F55,transparent 60%),var(--surface)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--s));transform-origin:50% 50%}
+.slide{position:absolute;inset:0;padding:60px 96px 96px;opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s;display:flex;flex-direction:column}
+.slide.active{opacity:1;visibility:visible;transition:opacity .35s ease}
+/* staged reveal */
+.r{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .6s var(--ease);transition-delay:calc(var(--i,0) * 90ms + 80ms)}
+.slide.in .r{opacity:1;transform:none}
+
+/* type */
+.eyebrow{display:flex;align-items:center;gap:10px;color:var(--main-500);font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 18px}
+.eyebrow svg{width:16px;height:16px;flex:none}
+h1{font-size:84px;line-height:1.08;font-weight:700;letter-spacing:-.01em;margin:0}
+h2{font-size:46px;line-height:1.18;font-weight:600;letter-spacing:-.005em;margin:0 0 28px;max-width:1300px}
+h3{font-size:22px;line-height:1.35;font-weight:600;margin:0 0 8px}
+p{margin:0}
+.lead{font-size:26px;line-height:1.5;color:var(--text-2);max-width:1100px}
+.body{font-size:20px;line-height:1.55;color:var(--text-2)}
+.small{font-size:17px;line-height:1.5;color:var(--text-2)}
+.src{font-size:13.5px;line-height:1.45;color:var(--text-3);letter-spacing:.01em}
+.src a{color:var(--text-3);text-decoration:underline;text-decoration-color:var(--gb-200);text-underline-offset:2px}
+.w{color:var(--text)}
+.g{color:var(--main-500)}
+.o{color:var(--orange-500)}
+.quote{font-size:22px;line-height:1.5;color:var(--text);border-left:3px solid var(--main-500);padding:4px 0 4px 20px}
+.quote cite{display:block;font-style:normal;font-size:14px;color:var(--text-3);margin-top:8px}
+.foot{margin-top:auto;padding-top:16px}
+
+/* tags (Quests reward tag language) */
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:var(--r-s);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;vertical-align:middle}
+.t-obs{background:var(--main-25);color:var(--main-400)}
+.t-asm{background:var(--info-25);color:var(--info-400)}
+.t-pro{box-shadow:inset 0 0 0 1px var(--gb-100);color:var(--gb-25)}
+.t-ph{background:var(--error-25);color:var(--error-400)}
+.time{display:inline-flex;align-items:center;height:26px;padding:0 9px;border-radius:var(--r-s);background:var(--card);box-shadow:inset 0 0 0 1px var(--stroke);font-size:13px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.price{display:inline-flex;align-items:center;height:26px;padding:0 9px;border-radius:var(--r-s);background:var(--main-25);color:var(--main-500);font-size:14px;font-weight:500;white-space:nowrap}
+
+/* surfaces */
+.panel{background:var(--sheet);border:1px solid var(--stroke);border-radius:var(--r-xl);padding:28px}
+.tile{background:var(--tile);border:1px solid var(--stroke);border-radius:var(--r-l);padding:20px 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:60px;padding:0 36px;border-radius:var(--r-full);background:var(--main-500);color:var(--gb-900);font:600 21px/1 var(--font);letter-spacing:.02em;text-decoration:none;box-shadow:inset 0 -4px 0 var(--main-700);border:0;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 var(--main-700)}
+.btn:focus-visible,.navbtn:focus-visible,.ghost:focus-visible{outline:2px solid var(--main-400);outline-offset:3px}
+.ghost{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:var(--r-full);background:var(--card);border:1px solid var(--stroke);color:var(--text-2);font:500 14px/1 var(--font);cursor:pointer}
+
+/* phone */
+.phone{--h:600px;display:inline-block;padding:7px;border-radius:calc(var(--h) * .055);background:#06070D;box-shadow:0 0 0 1px var(--gb-300),0 24px 60px rgba(0,0,0,.45);position:relative;flex:none}
+.phone .scr{height:var(--h);width:calc(var(--h) * .461538);border-radius:calc(var(--h) * .045);overflow:hidden;position:relative;background:#000}
+.phone .scr img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.phone::after{content:"";position:absolute;top:calc(7px + var(--h) * .012);left:50%;width:calc(var(--h)*.013);height:calc(var(--h)*.013);margin-left:calc(var(--h)*-.0065);border-radius:50%;background:#05060A;box-shadow:0 0 0 1px #1a1b28}
+figure{margin:0}
+.ph-cap{margin-top:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.ph-cap .small{max-width:100%}
+
+/* Next reward card (crop of Dimi's exported states, outline + glow as in Glow/Action) */
+.nrcw{container-type:inline-size;width:260px}
+.nrc{border-radius:6cqw;overflow:hidden;background:var(--card);box-shadow:0 0 0 1.5px var(--main-500),0 0 28px 4px var(--glow-action)}
+.nrc img{width:100%;display:block}
+.nrc .notnow{text-align:center;color:var(--text-2);font-weight:500;font-size:calc(100cqw * 14 / 323);line-height:calc(100cqw * 21 / 323);padding:calc(100cqw * 4 / 323) 0 calc(100cqw * 13 / 323);letter-spacing:.02em}
+
+/* layout helpers */
+.row{display:flex;gap:40px}
+.col{display:flex;flex-direction:column}
+.center{align-items:center}
+.grow{flex:1;min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.list li{position:relative;padding-left:22px;font-size:19px;line-height:1.5;color:var(--text-2)}
+.list li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--main-500)}
+.list.o li::before{background:var(--orange-500)}
+.list.n li::before{background:var(--gb-100)}
+.legend{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center}
+.legend span.small{margin-left:8px}
+
+/* chrome */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--main-500);width:0;transition:width .35s var(--ease);z-index:10;box-shadow:0 0 12px var(--main-500)}
+#chrome{position:fixed;right:20px;bottom:16px;display:flex;align-items:center;gap:10px;z-index:10}
+#count{font:600 13px/1 var(--font);color:var(--text-3);font-variant-numeric:tabular-nums;letter-spacing:.08em;min-width:64px;text-align:right}
+.navbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--stroke);background:var(--gb-700);color:var(--text-2);display:grid;place-items:center;cursor:pointer;padding:0}
+.navbtn svg{width:18px;height:18px}
+.navbtn:disabled{opacity:.35;cursor:default}
+#hint{position:fixed;left:20px;bottom:24px;font:500 12px/1 var(--font);color:var(--text-3);letter-spacing:.06em;z-index:10;transition:opacity .6s}
+
+/* ---------- slide specific ---------- */
+/* 1 title */
+.s-title{justify-content:center}
+.s-title h1{font-size:104px;max-width:1150px}
+.s-title .art{position:absolute;right:96px;top:50%;transform:translateY(-50%)}
+.namecard{display:flex;align-items:center;gap:16px;margin-top:44px}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--gb-400);display:grid;place-items:center;font-weight:600;font-size:20px;color:var(--main-500);box-shadow:inset 0 -2px 0 var(--main-800)}
+
+/* pipeline */
+.pipe{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:16px;margin-top:8px}
+.pipe .track{position:absolute;left:24px;right:24px;top:23px;height:2px;background:var(--stroke);overflow:hidden}
+.pipe .track i{position:absolute;inset:0;background:var(--main-500);transform:scaleX(0);transform-origin:0 50%;transition:transform 1.6s var(--ease) .25s}
+.slide.in .pipe .track i{transform:scaleX(1)}
+.step{position:relative;display:flex;flex-direction:column;gap:12px}
+.step .dot{width:48px;height:48px;border-radius:50%;background:var(--gb-700);border:2px solid var(--stroke);display:grid;place-items:center;font-weight:600;font-size:15px;color:var(--text-2);transition:background .4s,border-color .4s,color .4s;transition-delay:calc(var(--i) * 200ms + 250ms)}
+.slide.in .step .dot{background:var(--main-25);border-color:var(--main-500);color:var(--main-500)}
+.step .tile{padding:16px 16px 18px;flex:1;display:flex;flex-direction:column;gap:8px}
+.step h3{font-size:20px;margin:0}
+.step .big{font-size:40px;font-weight:700;line-height:1.1;color:var(--text);font-variant-numeric:tabular-nums}
+.step .unit{font-size:16px;color:var(--text-2);line-height:1.45}
+.step .note{font-size:15px;line-height:1.5;color:var(--text-3);margin-top:auto}
+.step .kv{display:flex;justify-content:space-between;gap:8px;font-size:15px;color:var(--text-2);border-bottom:1px solid var(--stroke-2);padding:3px 0}
+.step .kv b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* who decided */
+.who{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.who .panel h3{display:flex;align-items:center;gap:12px;font-size:24px;margin-bottom:18px}
+.who .list li{font-size:20px}
+
+/* boards */
+.boardbox{position:relative;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--stroke);background:#16172A}
+.boardbox.scroll{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gb-300) transparent}
+.boardbox .lbl{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(#16172Aee,#16172Acc);backdrop-filter:blur(6px);font-size:14px;font-weight:600;border-bottom:1px solid var(--stroke)}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:44px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:15px;color:var(--text-2);line-height:1.4}
+.audit{display:flex;flex-direction:column;gap:10px}
+.audit .chk{display:flex;align-items:center;gap:12px;font-size:17px;color:var(--text)}
+.audit .chk i{width:24px;height:24px;border-radius:6px;background:var(--main-25);display:grid;place-items:center;flex:none}
+.audit .chk svg{width:14px;height:14px}
+
+/* 44 seconds */
+.s44 .row{gap:56px;align-items:flex-start;flex:1;min-height:0}
+.s44 .scr img{opacity:0;transition:opacity .22s ease,transform .32s var(--ease)}
+.s44 .scr img.on{opacity:1;transform:none!important}
+.s44 .scr img.top{transform:translateY(-6%)}
+.s44 .scr img.bot{transform:translateY(6%)}
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.ctr{background:var(--sheet);border-radius:var(--r-l);padding:12px 18px 12px;border:1px solid var(--stroke);border-bottom-width:3px}
+.ctr b{display:block;font-size:52px;line-height:1.05;font-weight:700;font-variant-numeric:tabular-nums}
+.ctr span{font-size:15px;color:var(--text-2)}
+.ctr.c1{border-color:var(--gb-100)}
+.ctr.c2{border-color:var(--main-800)}
+.ctr.c2 b{color:var(--main-500)}
+.ctr.c3{border-color:var(--orange-800)}
+.ctr.c3 b{color:var(--orange-500)}
+.ctr b.bump{animation:bump .35s var(--ease)}
+@keyframes bump{40%{transform:scale(1.12)}}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tl li{display:grid;grid-template-columns:70px 1fr 150px 168px;gap:14px;align-items:center;padding:7px 12px;border-radius:var(--r-m);font-size:16px;line-height:1.35;color:var(--text-2);opacity:.22;transition:opacity .3s,background .3s}
+.tl li.seen{opacity:1}
+.tl li.now{background:var(--sheet);box-shadow:inset 0 0 0 1px var(--stroke)}
+.tl li .what{color:var(--text)}
+.tl li .act{font-size:14px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.tl li .act .claim{color:var(--main-500);font-weight:600}
+.pos{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.pos svg{width:16px;height:26px;flex:none}
+.tl-head{display:grid;grid-template-columns:70px 1fr 150px 168px;gap:14px;padding:0 12px 6px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.replay{margin-top:14px;display:flex;gap:14px;align-items:center}
+
+/* principles table */
+.ptab{display:flex;flex-direction:column;gap:7px}
+.prow{display:grid;grid-template-columns:36px 1.15fr 1fr 1.15fr;gap:22px;align-items:start;padding:8px 18px;border-radius:var(--r-l);background:var(--sheet);border:1px solid var(--stroke)}
+.prow .n{font-weight:700;color:var(--main-500);font-size:18px;line-height:1.4}
+.prow .obs{font-size:16.5px;line-height:1.45;color:var(--text)}
+.prow .term{font-size:16.5px;line-height:1.4;font-weight:600;color:var(--text)}
+.prow .term small{display:block;font-weight:400;color:var(--text-2);font-size:14px;line-height:1.45;margin-top:2px}
+.prow .seen{font-size:14.5px;line-height:1.45;color:var(--text-2)}
+.prow .seen .time{height:22px;font-size:12px;margin-right:6px}
+.phead{display:grid;grid-template-columns:36px 1.15fr 1fr 1.15fr;gap:22px;padding:0 18px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+
+/* rules */
+.rules{counter-reset:r;display:flex;flex-direction:column;gap:12px}
+.rule{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;padding:14px 18px;border-radius:var(--r-l);background:var(--sheet);border:1px solid var(--stroke)}
+.rule .k{width:36px;height:36px;border-radius:50%;background:var(--main-25);color:var(--main-500);display:grid;place-items:center;font-weight:700;font-size:16px}
+.rule h3{font-size:20px;margin:0 0 2px}
+.rule p{font-size:16px;line-height:1.5;color:var(--text-2)}
+.queue{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--text-2)}
+.queue .q{padding:6px 12px;border-radius:var(--r-full);background:var(--tile);border:1px solid var(--stroke);color:var(--text)}
+.queue .arr{color:var(--text-3)}
+
+/* states grid */
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 30px;align-items:start}
+.states .nrcw{width:244px}
+.state{display:flex;flex-direction:column;gap:12px}
+.state .meta{display:flex;flex-direction:column;gap:4px}
+.state .meta h3{font-size:17px;margin:0;display:flex;align-items:center;gap:8px}
+.state .meta h3 .k{font-size:13px;color:var(--main-500);font-weight:700;min-width:16px}
+.state .meta p{font-size:14px;line-height:1.45;color:var(--text-2)}
+
+/* before / after */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:48px;flex:1;min-height:0}
+.ba .side{display:flex;gap:28px;align-items:flex-start}
+.ba .facts{display:flex;flex-direction:column;gap:16px;padding-top:8px}
+.ba .fact b{display:block;font-size:40px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}
+.ba .fact span{font-size:15px;color:var(--text-2);line-height:1.4;display:block;margin-top:2px}
+.thumbs{display:flex;gap:6px;margin-top:4px}
+.thumbs img{width:34px;height:74px;object-fit:cover;border-radius:5px;box-shadow:0 0 0 1px var(--stroke)}
+
+/* measure */
+.metric{display:flex;flex-direction:column;gap:10px}
+.wrong{background:linear-gradient(180deg,#2A1A22,#1D1E30);border:1px solid #DE2C2C55;border-radius:var(--r-xl);padding:22px 26px}
+.wrong h3{color:var(--error-400);font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+
+/* close */
+.s-close{justify-content:center}
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+<div id="deck">
+<main id="stage" aria-live="polite">
+
+<!-- 1 TITLE -->
+<section class="slide s-title" data-title="Title" aria-label="Title">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Almedia · Case study · Director of Product Design</div>
+  <h1 class="r" style="--i:1">Freecash asks<br>before it gives.</h1>
+  <p class="lead r" style="--i:2;margin-top:28px;max-width:860px">One pain point in the first session, and one card that puts the reward before the ask.</p>
+  <div class="namecard r" style="--i:3">
+    <div class="avatar">D</div>
+    <div class="col" style="gap:6px">
+      <div style="font-size:22px;font-weight:600">Dimi <span style="color:var(--text-3);font-weight:500">[Surname · contact line]</span></div>
+      <div><span class="tag t-ph">Placeholder</span> <span class="small" style="margin-left:6px">Surname and contact to fill in</span></div>
+    </div>
+  </div>
+  <div class="art r" style="--i:4">
+    <div class="nrcw" style="width:380px"><div class="nrc"><img src="img/card-claim.png" alt="Next reward card, Claim state: Streak case, ready to open, 2 freezes inside, up to 9.09€, Open streak case"></div></div>
+  </div>
+</section>
+
+<!-- 2 FOREWORD: BRIEF -->
+<section class="slide" style="justify-content:center" data-title="Foreword: the brief" aria-label="Foreword: the brief">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Foreword · The thought process</div>
+  <h2 class="r" style="--i:1">The brief, and the budget I set myself.</h2>
+  <div class="row" style="gap:48px;align-items:stretch">
+    <div class="panel grow r" style="--i:2">
+      <div class="small" style="text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--text-3);margin-bottom:12px">The brief, in one line</div>
+      <p style="font-size:30px;line-height:1.45;font-weight:500">Find one pain point in Freecash, show what it costs the user and the business, solve it in high-fidelity UI, and say how to measure it.</p>
+      <p class="body" style="margin-top:20px">Two deliverables: this account of the thinking, and a working prototype. More than half the time on hi-fi UI.</p>
+    </div>
+    <div class="panel r timebox" style="--i:3;width:440px;display:flex;flex-direction:column;justify-content:space-between">
+      <div class="small" style="text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--text-3)">Time</div>
+      <div>
+        <div style="display:flex;align-items:baseline;gap:16px"><span style="font-size:22px;color:var(--text-3);text-decoration:line-through">6 h allowed</span></div>
+        <div style="font-size:72px;font-weight:700;line-height:1.05;margin-top:6px">under <span class="g">4 h</span></div>
+      </div>
+      <p class="small">I used AI as a speed tool, to see how far a design director gets in less time. The judgement stays mine.</p>
+    </div>
+  </div>
+  <div class="r" style="--i:4;margin-top:48px">
+    <div class="legend">
+      <span class="small w" style="margin:0">How to read the deck:</span>
+      <span><span class="tag t-obs">Observed</span><span class="small">seen in my recording</span></span>
+      <span><span class="tag t-asm">Assumption</span><span class="small">to be tested</span></span>
+      <span><span class="tag t-pro">Proposal</span><span class="small">my design call</span></span>
+      <span><span class="tag t-ph">Placeholder</span><span class="small">value to confirm</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- 3 FOREWORD: PIPELINE -->
+<section class="slide" data-title="Foreword: how I broke it down" aria-label="Foreword: how I broke it down">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Foreword · The thought process</div>
+  <h2 class="r" style="--i:1">How I broke it down: system first, then evidence, then one problem.</h2>
+  <div class="pipe">
+    <div class="track"><i></i></div>
+    <div class="step r" style="--i:2"><div class="dot" style="--i:0">01</div><div class="tile">
+      <h3>Guidelines to system</h3><div class="unit">3 PDFs became a Figma library</div>
+      <div><div class="kv"><span>Colour primitives</span><b data-to="127">127</b></div><div class="kv"><span>Semantic tokens</span><b data-to="85">85</b></div><div class="kv"><span>Space and type vars</span><b data-to="51">51</b></div><div class="kv"><span>Text styles</span><b data-to="44">44</b></div><div class="kv"><span>Paint styles</span><b data-to="9">9</b></div></div>
+      <p class="note">Where a printed hex disagreed with its swatch, the swatch won.</p></div></div>
+    <div class="step r" style="--i:3"><div class="dot" style="--i:1">02</div><div class="tile">
+      <h3>Use the product</h3><div class="big">9:52</div><div class="unit">minutes recorded on Android, first launch to Quests</div>
+      <p class="note">Notes written with timestamps as I went.</p></div></div>
+    <div class="step r" style="--i:4"><div class="dot" style="--i:2">03</div><div class="tile">
+      <h3>Read the recording</h3><div class="big" data-to="28">28</div><div class="unit">key frames at full resolution, from one frame per second</div>
+      <p class="note">Colours and sizes measured from the frames, at 360 × 780 dp.</p></div></div>
+    <div class="step r" style="--i:5"><div class="dot" style="--i:3">04</div><div class="tile">
+      <h3>Rebuild what exists</h3><div class="big" data-to="110">110</div><div class="unit">components, and <b class="w" data-to="22">22</b> current screens</div>
+      <p class="note">Screens composed only from instances, then audited.</p></div></div>
+    <div class="step r" style="--i:6"><div class="dot" style="--i:4">05</div><div class="tile">
+      <h3>One problem</h3><div class="big" style="font-size:24px;line-height:1.3">Hook timing</div><div class="unit">The rest is listed, not designed.</div>
+      <p class="note">I chose it from my notes, and proposed the card.</p></div></div>
+    <div class="step r" style="--i:7"><div class="dot" style="--i:5">06</div><div class="tile">
+      <h3>Design it</h3><div class="big" data-to="10">10</div><div class="unit">proposed screens and one card with 9 states</div>
+      <p class="note">Same system, no new parts except one glow.</p></div></div>
+    <div class="step r" style="--i:8"><div class="dot" style="--i:6">07</div><div class="tile">
+      <h3>Deck and prototype</h3><div class="big" style="font-size:24px;line-height:1.3">This deck</div><div class="unit">and a prototype you can tap through.</div>
+      <p class="note">Every claim sourced or labelled.</p></div></div>
+  </div>
+</section>
+
+<!-- 4 FOREWORD: WHO DECIDED -->
+<section class="slide" style="justify-content:center" data-title="Foreword: who decided what" aria-label="Foreword: who decided what">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Foreword · The thought process</div>
+  <h2 class="r" style="--i:1">Who decided what.</h2>
+  <div class="who">
+    <div class="panel r" style="--i:2;border-color:var(--main-800)">
+      <h3><span class="avatar" style="width:40px;height:40px;font-size:16px">D</span>Mine</h3>
+      <ul class="list">
+        <li><span class="w">The pain point:</span> the priority and timing of the app's psychological hooks.</li>
+        <li><span class="w">The Next reward card</span> as the answer.</li>
+        <li><span class="w">Every observation</span> from the recording, and the notes behind them.</li>
+        <li><span class="w">The token architecture</span>: primitives, semantic layer, naming.</li>
+      </ul>
+    </div>
+    <div class="panel r" style="--i:3">
+      <h3><span class="avatar" style="width:40px;height:40px;font-size:13px;color:var(--text-2);box-shadow:none">AI</span>Claude Code: built, measured, drafted</h3>
+      <ul class="list n">
+        <li>Extracted the three PDFs into the Figma library and checked every hex against its swatch.</li>
+        <li>Measured colours and sizes from the recording's frames.</li>
+        <li>Built the components and screens in Figma, through the PluginOS bridge.</li>
+        <li>Drafted the proposed states from my notes, for my review.</li>
+        <li>Found the terms and sources cited here, built this deck and the prototype.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="body r" style="--i:4;margin-top:40px">Every claim in this deck is either observed in my recording or labelled as assumption, proposal or placeholder.</p>
+</section>
+
+<!-- 5 SYSTEM -->
+<section class="slide" data-title="The system" aria-label="The system">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Hi-fi groundwork</div>
+  <h2 class="r" style="--i:1">First, Freecash's own system. Built before I designed anything.</h2>
+  <div class="row" style="gap:28px;flex:1;min-height:0">
+    <div class="boardbox scroll no-nav r" style="--i:2;width:430px" tabindex="0" aria-label="Foundations board, scrollable">
+      <div class="lbl"><span>Foundations</span><span class="small">scroll</span></div>
+      <img src="img/foundations-board.jpg" alt="Foundations board: colour primitives, semantic tokens, typography, spacing, radius and gradients" loading="lazy">
+    </div>
+    <div class="boardbox scroll no-nav r" style="--i:3;width:430px" tabindex="0" aria-label="Components board, scrollable">
+      <div class="lbl"><span>Components</span><span class="small">scroll</span></div>
+      <img src="img/components-board.jpg" alt="Components board: icons, art, illustrations, atoms, navigation, cards, forms, sheets and modals" loading="lazy">
+    </div>
+    <div class="col grow r" style="--i:4;gap:24px">
+      <div class="g2" style="gap:20px 24px">
+        <div class="stat"><b data-to="127">127</b><span>colour primitives</span></div>
+        <div class="stat"><b data-to="85">85</b><span>semantic tokens</span></div>
+        <div class="stat"><b data-to="44">44</b><span>text styles</span></div>
+        <div class="stat"><b data-to="110">110</b><span>components</span></div>
+      </div>
+      <div class="panel" style="padding:22px 24px">
+        <div class="small" style="text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--text-3);margin-bottom:14px">Binding audit, 22 current screens</div>
+        <div class="audit">
+          <div class="chk"><i><svg viewBox="0 0 14 14"><path d="M2 7.5l3 3 7-7" fill="none" stroke="#01D676" stroke-width="2"/></svg></i>No unstyled text</div>
+          <div class="chk"><i><svg viewBox="0 0 14 14"><path d="M2 7.5l3 3 7-7" fill="none" stroke="#01D676" stroke-width="2"/></svg></i>No unbound fill, stroke or gap</div>
+          <div class="chk"><i><svg viewBox="0 0 14 14"><path d="M2 7.5l3 3 7-7" fill="none" stroke="#01D676" stroke-width="2"/></svg></i>No loose element on any screen</div>
+        </div>
+      </div>
+      <p class="small">Poppins, Gray Blue surfaces, Main green for action, yellow only for offers, orange for streaks. Same rules in this deck.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 CURRENT FLOW -->
+<section class="slide" data-title="The product as it is" aria-label="The product as it is">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Hi-fi groundwork</div>
+  <div class="row textfirst" style="gap:56px;flex:1;min-height:0">
+    <a class="boardbox r no-nav" style="--i:2;width:720px;height:740px;display:block" href="img/current-flow-board.jpg" target="_blank" rel="noopener" aria-label="Open the current flow board full size">
+      <img src="img/current-flow-board.jpg" alt="Current flow board: 22 screens in four rows: onboarding, first session, return after the first offer, Quests tab" style="width:100%;height:100%;object-fit:cover;object-position:top" loading="lazy">
+    </a>
+    <div class="col grow" style="gap:24px">
+      <h2 class="r" style="--i:1;margin:0">Then the product as it is: 22 screens, rebuilt from instances.</h2>
+      <ul class="list r" style="--i:3">
+        <li><span class="w">Onboarding</span>, 00:11 to 01:59. Four asks before a single offer.</li>
+        <li><span class="w">First session</span>, 01:59 to 02:29. One offer, and every other path closed.</li>
+        <li><span class="w">Return after the first offer</span>, 06:29 to 07:14. Where the case lives.</li>
+        <li><span class="w">Quests tab</span>, 08:39 to 08:51. The pattern that already works.</li>
+      </ul>
+      <p class="small r" style="--i:4">Each screen carries my note underneath. Click the board to open it full size.</p>
+      <div class="r" style="--i:5"><span class="tag t-obs">Observed</span> <span class="small" style="margin-left:6px">Android, Samsung, recorded 13 Nov 2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 PAIN POINT -->
+<section class="slide" data-title="The pain point" aria-label="The pain point" style="justify-content:center">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>The pain point</div>
+  <h1 class="r" style="--i:1;font-size:92px;max-width:1300px">The moment new offers unlock is the moment the app covers them.</h1>
+  <p class="lead r" style="--i:2;margin-top:36px;max-width:1200px">Freecash asks before it gives. Rewards and commitment hooks arrive as a stack of blocking surfaces, timed against the user's intent instead of with it.</p>
+  <div class="r" style="--i:3;margin-top:36px;max-width:900px"><div class="quote">“The prioritization and proper timing of psychological hooks.”<cite>My note on where to focus</cite></div></div>
+</section>
+
+<!-- 8 THE 44 SECONDS -->
+<section class="slide s44" data-title="The 44 seconds" data-anim="s44" aria-label="The 44 seconds">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Evidence · Return after the first offer</div>
+  <h2 class="r" style="--i:1;margin-bottom:24px">06:29. New offers unlock. Then 44 seconds of this.</h2>
+  <div class="row">
+    <figure class="phone r" style="--i:2;--h:640px"><div class="scr" id="s44scr">
+      <img class="on" data-k="0" src="img/c-06-29-earn-offers-unlocked.jpg" alt="06:29 Earn tab with new offers unlocked: Coin Master, Coin Master Board Adventure, balance 10.39€ of 25€">
+      <img data-k="1" src="img/c-06-30-streak-started.jpg" alt="06:30 top sheet: You started a 1-day streak, Claim reward">
+      <img data-k="2" src="img/c-06-34-streak-freezes.jpg" alt="06:34 top sheet: You earned 2 Streak Freezes, Claim Reward">
+      <img data-k="3" src="img/c-06-38-streak-reward-case.jpg" alt="06:38 bottom sheet: Streak Reward case with prize reel, Claim Reward">
+      <img data-k="4" src="img/c-06-48-you-won-0-45.jpg" alt="06:48 same sheet: You won 0.45€, Claim">
+      <img data-k="5" src="img/c-06-49-friend-streak-drawer.jpg" alt="06:49 toast 0.45€ added, plus bottom drawer Start a friend streak">
+      <img data-k="6" src="img/c-06-54-friends-streak-sheet.jpg" alt="06:54 top sheet: Friends Streak, invite new friends">
+      <img data-k="7" src="img/c-06-56-set-your-streak-goal.jpg" alt="06:56 bottom sheet: Set your streak goal, Good, Great, Incredible, Unstoppable">
+      <img data-k="8" src="img/c-07-02-streak-goal-selected.jpg" alt="07:02 same sheet after tapping 30 days: You'll be 25x more likely to earn $100">
+      <img data-k="9" src="img/c-07-12-add-to-home-screen.jpg" alt="07:12 toast You've committed to earning daily, plus drawer Don't lose your rewards, Add to home screen">
+    </div></figure>
+    <div class="col grow r" style="--i:3">
+      <div class="counters">
+        <div class="ctr c1"><b id="c-surf">7</b><span>interrupting surfaces</span></div>
+        <div class="ctr c2"><b id="c-claim">3</b><span>Claim taps</span></div>
+        <div class="ctr c3"><b id="c-sec">44</b><span>seconds before I can scroll</span></div>
+      </div>
+      <div class="tl-head"><span>Time</span><span>Surface</span><span>Opens as</span><span>Asks me to</span></div>
+      <ol class="tl" id="s44tl">
+        <li data-k="0" class="seen"><span class="time">06:29</span><span class="what">Earn tab, new offers unlocked</span><span class="pos">—</span><span class="act">Nothing. I came back for this</span></li>
+        <li data-k="1" class="seen"><span class="time">06:30</span><span class="what">“You started a 1-day streak!”</span><span class="pos" data-p="top"></span><span class="act"><span class="claim">Claim reward</span> 1</span></li>
+        <li data-k="2" class="seen"><span class="time">06:34</span><span class="what">“You earned 2 Streak Freezes!”</span><span class="pos" data-p="top"></span><span class="act"><span class="claim">Claim Reward</span> 2</span></li>
+        <li data-k="3" class="seen"><span class="time">06:38</span><span class="what">Streak Reward case, prize reel</span><span class="pos" data-p="bot"></span><span class="act"><span class="claim">Claim Reward</span> 3</span></li>
+        <li data-k="4" class="seen"><span class="time">06:48</span><span class="what">“You won 0.45€”</span><span class="pos">same sheet</span><span class="act">Claim</span></li>
+        <li data-k="5" class="seen"><span class="time">06:49</span><span class="what">0.45€ toast + “Start a friend streak!”</span><span class="pos" data-p="both"></span><span class="act">Get started or dismiss</span></li>
+        <li data-k="6" class="seen"><span class="time">06:54</span><span class="what">Friends Streak, invite</span><span class="pos" data-p="top"></span><span class="act">Invite or dismiss</span></li>
+        <li data-k="7" class="seen"><span class="time">06:56</span><span class="what">“Set your streak goal”</span><span class="pos" data-p="bot"></span><span class="act">Commit or close</span></li>
+        <li data-k="9" class="seen"><span class="time">07:12</span><span class="what">Commit toast + “Add to home screen”</span><span class="pos" data-p="both"></span><span class="act">Add or dismiss</span></li>
+        <li data-k="10" class="seen"><span class="time">07:14</span><span class="what">Earn tab is finally scrollable</span><span class="pos">—</span><span class="act">—</span></li>
+      </ol>
+      <div class="replay"><button class="ghost no-nav" id="s44replay" type="button"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7a5 5 0 1 0 1.5-3.6M2 1.5V4h2.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Replay</button><span class="tag t-obs">Observed</span><span class="small">Top, bottom, toast, top again. Real timestamps from the recording.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 DETAIL THAT HURTS -->
+<section class="slide" data-title="The detail that hurts most" aria-label="The detail that hurts most">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Evidence · The detail that hurts most</div>
+  <div class="row textfirst" style="gap:56px;flex:1;min-height:0;align-items:flex-start">
+    <div class="row" style="gap:28px">
+      <figure class="r" style="--i:2"><div class="phone" style="--h:600px"><div class="scr"><img src="img/c-06-56-set-your-streak-goal.jpg" alt="06:56 Set your streak goal: 7 day Good, 14 day Great, 30 day Incredible, 50 day Unstoppable"></div></div>
+        <figcaption class="ph-cap"><span class="time">06:56</span><span class="small">Before the tap: adjectives.</span></figcaption></figure>
+      <figure class="r" style="--i:3"><div class="phone" style="--h:600px"><div class="scr"><img src="img/c-07-02-streak-goal-selected.jpg" alt="07:02 after tapping 30 days: You'll be 25x more likely to earn $100"></div></div>
+        <figcaption class="ph-cap"><span class="time">07:02</span><span class="small">After the tap: the payoff.</span></figcaption></figure>
+    </div>
+    <div class="col grow" style="gap:26px;padding-top:8px">
+      <h2 class="r" style="--i:1;margin:0">The payoff hides behind adjectives.</h2>
+      <p class="body r" style="--i:4">The goals read <span class="w">Good, Great, Incredible, Unstoppable</span>. What a goal is worth, <span class="o">“25x more likely to earn $100”</span> for 30 days, shows only after it is tapped.</p>
+      <p class="body r" style="--i:5">The sheet asks for a 30-day commitment and keeps the reason off screen. A reward I cannot see cannot motivate the choice.</p>
+      <div class="r" style="--i:6"><div class="quote">“I was about to close the drawer without knowing I could benefit from this.”<cite>My note at 07:03</cite></div></div>
+      <div class="r" style="--i:7"><span class="tag t-obs">Observed</span> <span class="small" style="margin-left:6px">5x for 7 days and 25x for 30 days appear after the tap.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 UPSTREAM -->
+<section class="slide" data-title="Same pattern upstream" aria-label="Same pattern upstream">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Evidence · Onboarding and first session</div>
+  <h2 class="r" style="--i:1">Same pattern upstream: ask first, show later.</h2>
+  <div class="row" style="gap:22px;justify-content:space-between">
+    <figure class="r" style="--i:2;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-00-11-notification-pre-prompt.jpg" alt="00:11 notification pre-prompt: Get notified when you get rewards"></div></div>
+      <figcaption class="ph-cap"><span class="time">00:11</span><span class="small">Notifications, before I know what the app does.</span></figcaption></figure>
+    <figure class="r" style="--i:3;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-01-30-question-7-earning-goal.jpg" alt="01:30 Question 7: How much do you want to earn today?"></div></div>
+      <figcaption class="ph-cap"><span class="time">01:30</span><span class="small">An earning goal, before a single offer is visible.</span></figcaption></figure>
+    <figure class="r" style="--i:4;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-02-12-toast-profile-locked.jpg" alt="02:12 toast: Start an offer to view your profile"></div></div>
+      <figcaption class="ph-cap"><span class="time">02:12</span><span class="small">“Start an offer to view your profile.”</span></figcaption></figure>
+    <figure class="r" style="--i:5;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-02-18-drawer-you-re-almost-there.jpg" alt="02:18 drawer: You're Almost There! Start my first offer"></div></div>
+      <figcaption class="ph-cap"><span class="time">02:18</span><span class="small">A drawer pushing the same single offer.</span></figcaption></figure>
+    <figure class="r" style="--i:6;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-02-26-installed-before.jpg" alt="02:26 Have you installed this game before? Yes or No"></div></div>
+      <figcaption class="ph-cap"><span class="time">02:26</span><span class="small">Asks what the app could check.</span></figcaption></figure>
+    <figure class="r" style="--i:7;width:206px"><div class="phone" style="--h:418px"><div class="scr"><img src="img/c-02-29-sign-up-bonus.jpg" alt="02:29 Sign-up Bonus 10.00€, Get 10€"></div></div>
+      <figcaption class="ph-cap"><span class="time">02:29</span><span class="small">10.00€, the biggest reward so far. No ask attached.</span></figcaption></figure>
+  </div>
+  <div class="foot r" style="--i:8"><span class="tag t-obs">Observed</span> <span class="small" style="margin-left:6px">Listed, not redesigned. The 10.00€ bonus is where the notification ask belongs.</span></div>
+</section>
+
+<!-- 11 WHAT WORKS -->
+<section class="slide" data-title="What already works" aria-label="What already works">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Evidence · What already works</div>
+  <div class="row textfirst" style="gap:56px;flex:1;min-height:0;align-items:flex-start">
+    <div class="row" style="gap:28px">
+      <figure class="r" style="--i:2"><div class="phone" style="--h:600px"><div class="scr"><img src="img/c-08-39-quests.jpg" alt="08:39 Quests tab: priced quests including Enable Push Notifications, Add your streaks to the homepage 0.09€, Complete 7-day Streak with a friend 4.55€"></div></div>
+        <figcaption class="ph-cap"><span class="time">08:39</span><span class="small">Quests: the same asks, priced.</span></figcaption></figure>
+      <figure class="r" style="--i:3"><div class="phone" style="--h:600px"><div class="scr"><img src="img/c-08-51-quest-details.jpg" alt="08:51 Quest Details: Install 2 apps, use them for 2 minutes, 0.45€, progress 1 of 2"></div></div>
+        <figcaption class="ph-cap"><span class="time">08:51</span><span class="small">One task, one reward, progress 1/2.</span></figcaption></figure>
+    </div>
+    <div class="col grow" style="gap:24px;padding-top:8px">
+      <h2 class="r" style="--i:1;margin:0">The product already knows the right pattern.</h2>
+      <div class="col r" style="--i:4;gap:10px">
+        <div class="tile" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px"><span class="small w">Add your streaks to the homepage</span><span class="price">0.09€</span></div>
+        <div class="tile" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px"><span class="small w">Complete 7-day Streak with a friend</span><span class="price">4.55€</span></div>
+        <div class="tile" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px"><span class="small w">Install 2 apps, use them for 2 minutes</span><span class="price">0.45€</span></div>
+      </div>
+      <p class="body r" style="--i:5">It also pays for attention: <span class="w">0.05€ per onboarding answer</span> from 01:03, and <span class="w">0.05€ per step</span> of the My Offers tour from 07:25. Freecash already gives before it asks, in the small.</p>
+      <p class="body r" style="--i:6"><span class="w">Applied in one tab. Ignored at the highest-intent moment.</span></p>
+      <div class="r" style="--i:7"><span class="tag t-obs">Observed</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 WHY USER -->
+<section class="slide" data-title="Why it hurts the user" aria-label="Why it hurts the user">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Why it is a problem for the user</div>
+  <h2 class="r" style="--i:1;margin-bottom:18px">Seven observations, each with its principle.</h2>
+  <div class="phead r" style="--i:1;margin-bottom:6px"><span></span><span>What I saw</span><span>Principle</span><span>Where, and source</span></div>
+  <div class="ptab">
+    <div class="prow r" style="--i:2"><span class="n">1</span><span class="obs">Value has to be shown before a commitment is asked.</span><span class="term">In-context permission request<small>Ask when the feature is in use, with the benefit first.</small></span><span class="seen"><span class="time">00:11</span>Notifications asked before sign-up.<br><span class="src">Android Developers, “Request runtime permissions”; Apple HIG, “Privacy”; Kendrick, NN/g, 2018.</span></span></div>
+    <div class="prow r" style="--i:3"><span class="n">2</span><span class="obs">Seven surfaces in 44 seconds interrupt a goal I am actively pursuing.</span><span class="term">Cost of interruption, overlay overload<small>Interrupted people work faster, with more stress and frustration.</small></span><span class="seen"><span class="time">06:30</span>to 07:14, while the new offers sit underneath.<br><span class="src">Mark, Gudith &amp; Klocke, CHI 2008; Moran, NN/g, 2021.</span></span></div>
+    <div class="prow r" style="--i:4"><span class="n">3</span><span class="obs">A reward I cannot see does not motivate the choice.</span><span class="term">Information scent<small>Labels must signal what lies behind them.</small></span><span class="seen"><span class="time">06:56</span>“Incredible” stands in for 25x.<br><span class="src">Budiu, NN/g, 2020; Pirolli &amp; Card, Psychological Review, 1999.</span></span></div>
+    <div class="prow r" style="--i:5"><span class="n">4</span><span class="obs">Three near-identical Claim taps for one event teach me to tap without reading.</span><span class="term">Habituation<small>Repeated look-alike dialogs get dismissed on reflex. Shown for warnings and consent; applied here by analogy.</small></span><span class="seen"><span class="time">06:30</span>06:34, 06:38.<br><span class="src">Böhme &amp; Köpsell, CHI 2010; Anderson et al., JMIS, 2016.</span></span></div>
+    <div class="prow r" style="--i:6"><span class="n">5</span><span class="obs">Top sheet, bottom sheet, toast, top again: the surfaces feel disconnected.</span><span class="term">Consistency, and motion that shows where things come from<small>One element that changes in place keeps context.</small></span><span class="seen"><span class="time">06:29</span>to 06:39, “flashing on top of the UI”.<br><span class="src">Nielsen, NN/g, heuristic 4; Material Design, “Material motion”.</span></span></div>
+    <div class="prow r" style="--i:7"><span class="n">6</span><span class="obs">Hooks after a few earned rewards build commitment. Before any reward, they read as friction.</span><span class="term">Foot in the door, commitment and consistency<small>A small yes makes a larger yes likelier. The after-reward order is my hypothesis.</small></span><span class="seen"><span class="time">06:56</span>A 30-day goal, before the second offer.<br><span class="src">Freedman &amp; Fraser, JPSP, 1966; Cialdini, Influence.</span></span></div>
+    <div class="prow r" style="--i:8"><span class="n">7</span><span class="obs">Knowing the next reward is one tap away is the strongest pull the product has.</span><span class="term">Goal-gradient effect<small>Effort rises as the goal gets closer. “Strongest pull” is my read, not a finding.</small></span><span class="seen"><span class="time">06:29</span>10.39€ of a 25€ first cashout.<br><span class="src">Kivetz, Urminsky &amp; Zheng, JMR, 2006; Hull, 1932.</span></span></div>
+  </div>
+  <p class="src foot r" style="--i:9;max-width:800px">Full references with links: SOURCES.md, next to this deck.</p>
+</section>
+
+<!-- 13 WHY BUSINESS -->
+<section class="slide" data-title="Why it matters for the business" aria-label="Why it matters for the business">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Why it matters for the business</div>
+  <h2 class="r" style="--i:1">Revenue follows offers started. This moment taxes the next one.</h2>
+  <div class="row" style="gap:40px;align-items:stretch">
+    <div class="col grow" style="gap:18px">
+      <div class="r" style="--i:2"><div class="quote" style="font-size:28px">“Games and apps pay us to find real players.”<cite>Freecash onboarding, 00:40 · <span class="g">Observed</span></cite></div></div>
+      <div class="g3" style="gap:22px;margin-top:16px">
+        <div class="tile r" style="--i:3"><h3>The highest-intent moment</h3><p class="body" style="font-size:19px">I have just earned, and new, higher-value offers have just unlocked. Every surface between “offers unlocked” and “second offer started” taxes it.</p></div>
+        <div class="tile r" style="--i:4"><h3>The hooks are worth keeping</h3><p class="body" style="font-size:19px">Streaks and notifications drive return visits. Friend streaks drive acquisition. Stacked and unpriced, they are easy to dismiss. Sequenced and priced, each gets a fair chance.</p></div>
+        <div class="tile r" style="--i:5"><h3>Trust converts</h3><p class="body" style="font-size:19px">The brief says it. Pre-ticked consent at 00:13, a permission prompt before value, and hidden rewards all spend it.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel r" style="--i:6;margin-top:28px;border-color:#059FDB55;display:flex;gap:20px;align-items:flex-start">
+    <span class="tag t-asm">Assumption</span>
+    <p class="body" style="color:var(--text)">There is conversion loss between returning from offer one and starting offer two, and between each hook being shown and being accepted. I had no Freecash data, so no number here that I did not observe.</p>
+  </div>
+</section>
+
+<!-- 14 HYPOTHESIS -->
+<section class="slide" data-title="Hypothesis" aria-label="Hypothesis" style="justify-content:center">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Hypothesis</div>
+  <p class="r" style="--i:1;font-size:46px;line-height:1.35;font-weight:500;max-width:1320px">If the reward and commitment hooks arrive <span class="g">one at a time, inline, with the reward visible before the ask</span>, more users start a second offer in the return session and more users accept each hook.</p>
+  <p class="lead r" style="--i:2;margin-top:32px">Because the app stops competing with its own offers.</p>
+  <div class="r" style="--i:3;margin-top:36px"><span class="tag t-pro">Proposal</span> <span class="small" style="margin-left:6px">A hypothesis to test, not a result.</span></div>
+</section>
+
+<!-- 15 THE CARD: RULES -->
+<section class="slide" data-title="The Next reward card" aria-label="The Next reward card: five rules">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>The solution</div>
+  <div class="row textfirst" style="gap:64px;flex:1;min-height:0;align-items:flex-start">
+    <figure class="r" style="--i:2"><div class="phone" style="--h:640px"><div class="scr"><img src="img/p-1-next-reward-streak-case.jpg" alt="Proposed Earn tab: the Next reward card at the top with the streak case, cashout progress and the first offer visible below"></div></div>
+      <figcaption class="ph-cap"><span class="tag t-pro">Proposal</span></figcaption></figure>
+    <div class="col grow" style="gap:18px">
+      <h2 class="r" style="--i:1;margin:0">The Next reward card: one card that holds the queue.</h2>
+      <div class="rules">
+        <div class="rule r" style="--i:3"><span class="k">1</span><div><h3>One ask at a time</h3><p>Queue dots show where you are, 1 of 4.</p></div></div>
+        <div class="rule r" style="--i:4"><span class="k">2</span><div><h3>Reward before the ask</h3><p>Every state carries its price, in the same tag the Quests tab uses.</p></div></div>
+        <div class="rule r" style="--i:5"><span class="k">3</span><div><h3>In place, never over the content</h3><p>The card expands inside the page. No overlay, no sheet. Offers stay scrollable.</p></div></div>
+        <div class="rule r" style="--i:6"><span class="k">4</span><div><h3>One tap to claim</h3><p>Winnings credited at once. Streak freezes ride along as a chip.</p></div></div>
+        <div class="rule r" style="--i:7"><span class="k">5</span><div><h3>No is cheap, and remembered</h3><p>“Not now” moves the ask to Quests with its reward intact.</p></div></div>
+      </div>
+      <div class="queue r" style="--i:8"><span>Queue, by rising commitment:</span><span class="q">Free reward</span><span class="arr">›</span><span class="q">Personal goal + friend add-on</span><span class="arr">›</span><span class="q">Home screen</span><span class="arr">›</span><span class="q">Notifications</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 STATES -->
+<section class="slide" data-title="State by state" aria-label="The card, state by state">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>The solution · State by state</div>
+  <h2 class="r" style="--i:1;margin-bottom:26px">Eight states, one place on the screen.</h2>
+  <div class="states">
+    <div class="state r" style="--i:2"><div class="nrcw"><div class="nrc"><img src="img/card-claim.png" alt="Claim state"></div></div><div class="meta"><h3><span class="k">1</span>Claim</h3><p>Streak case, priced up to 9.09€. Tap expands the card in place.</p></div></div>
+    <div class="state r" style="--i:3"><div class="nrcw"><div class="nrc"><img src="img/card-reveal.png" alt="Reveal state: prize reel inside the card, Drawing your prize"></div></div><div class="meta"><h3><span class="k">2</span>Reveal</h3><p>The reel spins, slows past a centre marker and lands. About 2.5 s.</p></div></div>
+    <div class="state r" style="--i:4"><div class="nrcw"><div class="nrc"><img src="img/card-won.png" alt="Won state: You won 0.45€, Added to your balance, 2 streak freezes, Next reward"></div></div><div class="meta"><h3><span class="k">3</span>Won</h3><p>0.45€ credited, balance counts up. Freezes ride along. No second Claim.</p></div></div>
+    <div class="state r" style="--i:5"><div class="nrcw"><div class="nrc"><img src="img/card-goal.png" alt="Goal state: Pick your streak goal, 7 days 5x, 14 days 10x, 30 days 25x selected, 50 days 40x, Add a friend streak, Commit to 30 days"><div class="notnow">Not now</div></div></div><div class="meta"><h3><span class="k">4</span>Goal</h3><p>Multiplier first. Friend streak is an add-on, not a new sheet. <span class="tag t-ph" style="height:20px;font-size:10.5px">10x, 40x placeholder</span></p></div></div>
+    <div class="state r" style="--i:6"><div class="nrcw"><div class="nrc"><img src="img/card-home.png" alt="Home state: Streak at a glance, 0.09€, Add to home screen"><div class="notnow">Not now</div></div></div><div class="meta"><h3><span class="k">5</span>Home</h3><p>The widget, at the price Quests already pays: 0.09€.</p></div></div>
+    <div class="state r" style="--i:7"><div class="nrcw"><div class="nrc"><img src="img/card-notify.png" alt="Notify state: Never miss a payout, +0.05€, Turn on notifications"><div class="notnow">Not now</div></div></div><div class="meta"><h3><span class="k">6</span>Notify</h3><p>Last in the queue, then the OS prompt. <span class="tag t-pro" style="height:20px;font-size:10.5px">0.05€ proposal</span></p></div></div>
+    <div class="state r" style="--i:8"><div class="nrcw"><div class="nrc"><img src="img/card-mile.png" alt="Milestone state: Complete Kingdom 1, Dice Dreams main reward, 0.01€, Play Dice Dreams"></div></div><div class="meta"><h3><span class="k">7</span>Milestone</h3><p>Queue empty: point at the nearest payout. Yellow, because it starts an offer.</p></div></div>
+    <div class="state r" style="--i:9"><div class="nrcw"><div class="nrc"><img src="img/card-track.png" alt="Track state, first session: Track your 10.00€, get a ping each time Dice Dreams pays, +0.05€, Turn on notifications"><div class="notnow">Not now</div></div></div><div class="meta"><h3><span class="k">A</span>Track, first session</h3><p>The 00:11 notification ask, moved to right after the 10.00€ bonus.</p></div></div>
+  </div>
+</section>
+
+<!-- 17 IN CONTEXT -->
+<section class="slide" data-title="In context" aria-label="The card in context">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>The solution · The proposed flow</div>
+  <h2 class="r" style="--i:1">The offers never leave the screen.</h2>
+  <div class="row" style="gap:34px;justify-content:space-between">
+    <figure class="r" style="--i:2;width:296px"><div class="phone" style="--h:520px"><div class="scr"><img src="img/p-1-next-reward-streak-case.jpg" alt="Claim state on the Earn tab"></div></div>
+      <figcaption class="ph-cap"><h3 style="margin:0;font-size:18px">Claim</h3><span class="small">168dp tall, so cashout progress and the first offer stay in the first viewport.</span></figcaption></figure>
+    <figure class="r" style="--i:3;width:296px"><div class="phone" style="--h:520px"><div class="scr"><img src="img/p-3-won-credited.jpg" alt="Won state: balance 10.84€ with a +0.45€ chip"></div></div>
+      <figcaption class="ph-cap"><h3 style="margin:0;font-size:18px">Won</h3><span class="small">Balance counts 10.39 to 10.84€, with a +0.45€ chip.</span></figcaption></figure>
+    <figure class="r" style="--i:4;width:296px"><div class="phone" style="--h:520px"><div class="scr"><img src="img/p-7-queue-empty-next-milestone.jpg" alt="Queue empty: Complete Kingdom 1, Play Dice Dreams"></div></div>
+      <figcaption class="ph-cap"><h3 style="margin:0;font-size:18px">Queue empty</h3><span class="small">The card keeps pointing at the nearest payout.</span></figcaption></figure>
+    <figure class="r" style="--i:5;width:296px"><div class="phone" style="--h:520px"><div class="scr"><img src="img/p-8-docked-on-scroll.jpg" alt="Docked: slim pill under the top bar, Open streak case, up to 9.09€"></div></div>
+      <figcaption class="ph-cap"><h3 style="margin:0;font-size:18px">Docked on scroll</h3><span class="small">A slim pill under the top bar. Tap to expand.</span></figcaption></figure>
+  </div>
+  <div class="foot r" style="--i:6;display:flex;gap:14px;align-items:center"><span class="tag t-pro">Proposal</span><span class="small">Drafted from my notes in the same system. <a href="img/proposed-flow-board.jpg" target="_blank" rel="noopener" class="no-nav">Open the full proposed-flow board</a>.</span></div>
+</section>
+
+<!-- 18 BEFORE / AFTER -->
+<section class="slide" data-title="Before and after" aria-label="Before and after, the return moment">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>The return moment · Before and after</div>
+  <h2 class="r" style="--i:1">Same moment, same rewards, a different order.</h2>
+  <div class="ba">
+    <div class="side r" style="--i:2">
+      <figure class="phone" style="--h:560px"><div class="scr"><img src="img/c-06-38-streak-reward-case.jpg" alt="Today: Streak Reward bottom sheet over the Earn tab"></div></figure>
+      <div class="facts">
+        <span class="tag t-obs" style="align-self:flex-start">Today · Observed</span>
+        <div class="fact"><b>7</b><span>surfaces over the offers</span></div>
+        <div class="fact"><b>3</b><span>Claim taps for one event</span></div>
+        <div class="fact"><b>44 s</b><span>from offers unlocked to first scroll</span></div>
+        <div class="thumbs" aria-hidden="true"><img src="img/c-06-30-streak-started.jpg" alt=""><img src="img/c-06-34-streak-freezes.jpg" alt=""><img src="img/c-06-38-streak-reward-case.jpg" alt=""><img src="img/c-06-49-friend-streak-drawer.jpg" alt=""><img src="img/c-06-54-friends-streak-sheet.jpg" alt=""><img src="img/c-06-56-set-your-streak-goal.jpg" alt=""><img src="img/c-07-12-add-to-home-screen.jpg" alt=""></div>
+      </div>
+    </div>
+    <div class="side r" style="--i:3">
+      <figure class="phone" style="--h:560px;box-shadow:0 0 0 1px var(--main-800),0 24px 60px rgba(0,0,0,.45),0 0 40px var(--main-25)"><div class="scr"><img src="img/p-1-next-reward-streak-case.jpg" alt="Proposed: Next reward card inline at the top of the Earn tab"></div></figure>
+      <div class="facts">
+        <span class="tag t-pro" style="align-self:flex-start">Proposed</span>
+        <div class="fact"><b class="g">0</b><span>overlays. One card, in place</span></div>
+        <div class="fact"><b class="g">1</b><span>tap to open, reward credited at once</span></div>
+        <div class="fact"><b class="g">&lt; 5 s</b><span>target to first scroll or offer tap</span></div>
+        <p class="small" style="max-width:250px">Offers visible from the first frame. The asks wait their turn.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 19 DECISIONS -->
+<section class="slide" data-title="Interaction and visual decisions" aria-label="Interaction and visual decisions">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Decisions</div>
+  <h2 class="r" style="--i:1">Built from Freecash's own parts. One new signal.</h2>
+  <div class="row" style="gap:40px;align-items:flex-start">
+    <div class="g3 grow" style="gap:22px">
+      <div class="panel r" style="--i:2;padding:22px 24px"><h3 class="g" style="font-size:15px;letter-spacing:.08em;text-transform:uppercase">Visual</h3>
+        <ul class="list" style="gap:12px"><li style="font-size:18px">Quests reward tag, raised green pill, prize cards and streak orange. Nothing new to learn.</li><li style="font-size:18px">One new signal: a green outline with a soft glow, reserved for the single next action.</li><li style="font-size:18px">Yellow stays exclusive to starting an offer. Only Milestone uses it.</li><li style="font-size:18px">Goal tiles lead with the multiplier, orange, 18px bold. Days come second.</li></ul></div>
+      <div class="panel r" style="--i:3;padding:22px 24px"><h3 class="g" style="font-size:15px;letter-spacing:.08em;text-transform:uppercase">Interaction</h3>
+        <ul class="list" style="gap:12px"><li style="font-size:18px">Expands in place. The page never dims.</li><li style="font-size:18px">The reel decelerates and ticks past a centre marker, so it reads as a draw, not a carousel.</li><li style="font-size:18px">Balance counts up with a +0.45€ chip. No second Claim.</li><li style="font-size:18px">Tile select rewrites the button: “Commit to 30 days”.</li><li style="font-size:18px">Docks to a pill on scroll.</li></ul></div>
+      <div class="panel r" style="--i:4;padding:22px 24px"><h3 class="g" style="font-size:15px;letter-spacing:.08em;text-transform:uppercase">Usability</h3>
+        <ul class="list" style="gap:12px"><li style="font-size:18px">Touch targets 44dp or taller. “Not now” sits in a 44dp row.</li><li style="font-size:18px">Reduced motion: the reel cross-fades to the result.</li><li style="font-size:18px">Colour is never the only signal: the selected goal has a tick and an outline.</li><li style="font-size:18px">Claim state is 168dp, so the first offer stays above the fold on 360 × 780.</li></ul></div>
+    </div>
+    <div class="r" style="--i:5;width:300px;flex:none"><div class="nrcw" style="width:300px"><div class="nrc"><img src="img/card-goal.png" alt="Goal state detail: multipliers lead each tile"><div class="notnow">Not now</div></div></div>
+      <p class="src" style="margin-top:14px">Goal state. 5x and 25x observed; 10x and 40x are placeholders.</p></div>
+  </div>
+  <div class="foot r" style="--i:6"><span class="tag t-pro">Proposal</span> <span class="small" style="margin-left:6px">Platform guidance agrees: ask in context and explain the benefit first (Android Developers, “Request runtime permissions”). LinkedIn's profile meter is a precedent for one card pointing at the next step.</span></div>
+</section>
+
+<!-- 20 MEASURE -->
+<section class="slide" data-title="Measuring success" aria-label="Measuring success">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Measuring success</div>
+  <h2 class="r" style="--i:1">Two numbers decide it. The rest keeps it honest.</h2>
+  <div class="g2" style="gap:28px">
+    <div class="col" style="gap:16px">
+      <div class="panel r" style="--i:2;padding:22px 24px;border-color:var(--main-800)"><div class="small" style="text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--main-500);margin-bottom:10px">Primary</div>
+        <p class="body w" style="font-size:19px">Second-offer start rate: share of users who start offer two within 10 minutes of returning from offer one.</p>
+        <div style="height:1px;background:var(--stroke);margin:14px 0"></div>
+        <p class="body w" style="font-size:19px">Time from Earn tab render to first scroll or offer tap.</p>
+        <div style="display:flex;gap:12px;margin-top:10px;align-items:center;flex-wrap:wrap"><span class="tag t-obs">Today 44 s</span><span class="tag t-pro">Target under 5 s</span></div></div>
+      <div class="tile r" style="--i:3"><h3 style="font-size:19px">Per hook, shown to accepted</h3><p class="small" style="font-size:18px">Streak goal commits, friend invites sent, home screen adds, notification opt-in (pre-prompt and OS prompt).</p></div>
+      <div class="tile r" style="--i:4"><h3 style="font-size:19px">Guardrails</h3><p class="small" style="font-size:18px">Day 1 and day 7 retention, day 2 streak return, streak case claims, offer revenue per new user at day 7, card dismiss rate, first-session uninstalls.</p></div>
+    </div>
+    <div class="col" style="gap:16px">
+      <div class="tile r" style="--i:5"><h3 style="font-size:19px">How</h3><p class="small" style="font-size:18px">A/B on new users with a hold-out. Events on every card state: shown, expanded, accepted, not now, docked tap. Before build, five moderated sessions on the prototype: do people notice the card, understand the queue, find declined asks in Quests?</p></div>
+      <div class="wrong r" style="--i:6"><h3>What would prove it wrong</h3><p class="body w" style="font-size:19px">Hook acceptance drops because inline asks are easier to ignore than modals, and second-offer starts do not rise to make up for it. The test reports both sides.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 PLACEHOLDERS & LEFT OUT -->
+<section class="slide" data-title="Open, and left out" aria-label="Placeholders, proposals, and what was left out">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>What is still open</div>
+  <h2 class="r" style="--i:1">What is still a placeholder, and what I saw and left out.</h2>
+  <div class="g2" style="gap:32px">
+    <div class="panel r" style="--i:2;padding:24px 26px">
+      <h3 style="margin-bottom:16px">In the design</h3>
+      <div class="col" style="gap:16px">
+        <div class="row" style="gap:14px;align-items:flex-start"><span class="tag t-ph" style="width:118px;justify-content:center">Placeholder</span><p class="small" style="font-size:18px">Streak multipliers 10x (14 days) and 40x (50 days). 5x and 25x are observed.</p></div>
+        <div class="row" style="gap:14px;align-items:flex-start"><span class="tag t-pro" style="width:118px;justify-content:center">Proposal</span><p class="small" style="font-size:18px">0.05€ for notifications. Quests lists the ask with no amount; 0.05€ matches one onboarding answer.</p></div>
+        <div class="row" style="gap:14px;align-items:flex-start"><span class="tag t-pro" style="width:118px;justify-content:center">Proposal</span><p class="small" style="font-size:18px">“Complete Kingdom 1, 0.01€” is observed in My Offers. Using it as the queue-empty state is mine.</p></div>
+        <div class="row" style="gap:14px;align-items:flex-start"><span class="tag t-asm" style="width:118px;justify-content:center">Hypothesis</span><p class="small" style="font-size:18px">That accepted hooks convert better inline. Not a result.</p></div>
+        <div class="row" style="gap:14px;align-items:flex-start"><span class="tag t-asm" style="width:118px;justify-content:center">To check</span><p class="small" style="font-size:18px">Paying for a permission. Apple's HIG bans incentives for the tracking request; I found no such rule for notifications. Confirm store policy before build.</p></div>
+      </div>
+    </div>
+    <div class="panel r" style="--i:3;padding:24px 26px">
+      <h3 style="margin-bottom:16px">Seen, not designed</h3>
+      <ul class="list n" style="gap:12px">
+        <li style="font-size:18px">00:13 Data-collection consent pre-ticked at sign-up.</li>
+        <li style="font-size:18px">00:29 An unrelated loading screen before the intro.</li>
+        <li style="font-size:18px">00:34 “Watch &amp; earn 0.05€” could count down and celebrate the first money.</li>
+        <li style="font-size:18px">01:30, 01:49 Goal questions narrow the offers to one game.</li>
+        <li style="font-size:18px">02:01 The balance drips coins with no explanation.</li>
+        <li style="font-size:18px">In the game: no sign that Freecash is tracking, and no milestones shown before playing.</li>
+        <li style="font-size:18px">06:29 Surfaces flash instead of transitioning.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 22 CLOSE -->
+<section class="slide s-close" data-title="Close" aria-label="Close">
+  <div class="eyebrow r" style="--i:0"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c.4 4.2 3.8 7.6 8 8-4.2.4-7.6 3.8-8 8-.4-4.2-3.8-7.6-8-8 4.2-.4 7.6-3.8 8-8z"/></svg>Try it</div>
+  <h1 class="r" style="--i:1;max-width:1200px">Give first. Then ask, one thing at a time.</h1>
+  <div class="r" style="--i:2;margin-top:44px;display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+    <a class="btn no-nav" href="../prototype/index.html">Open the prototype <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10M10 5l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <span class="small">The return moment, tappable.</span>
+  </div>
+  <p class="lead r" style="--i:3;margin-top:56px;max-width:1150px"><span class="w">Next, with a team:</span> five moderated sessions on the prototype, then the card behind an A/B test on new users, with events on every state.</p>
+  <p class="small r" style="--i:4;margin-top:40px">Dimi <span class="tag t-ph" style="margin-left:8px">Surname · contact</span></p>
+</section>
+
+</main>
+</div>
+
+<div id="hint">← → or click to move</div>
+<nav id="chrome" aria-label="Slide navigation">
+  <button class="navbtn" id="prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 18 18"><path d="M11 4L6 9l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <span id="count">01 / 22</span>
+  <button class="navbtn" id="next" type="button" aria-label="Next slide"><svg viewBox="0 0 18 18"><path d="M7 4l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var N=slides.length, cur=-1, root=document.documentElement;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var progress=document.getElementById('progress'), count=document.getElementById('count');
+  var prevB=document.getElementById('prev'), nextB=document.getElementById('next');
+  var timers=[];
+  function clearTimers(){timers.forEach(clearTimeout);timers=[];}
+  function pad(n){return (n<10?'0':'')+n;}
+
+  /* layout: scale 1600x900 stage, or reflow on phones */
+  function layout(){
+    var w=window.innerWidth,h=window.innerHeight;
+    var mobile = w<700 || (w<900 && h>w);
+    root.classList.toggle('m',mobile);
+    if(!mobile){root.style.setProperty('--s',Math.min(w/1600,h/900));}
+  }
+  window.addEventListener('resize',layout);layout();
+
+  /* counters */
+  function countUp(el){
+    var to=+el.getAttribute('data-to'); if(reduce){el.textContent=to;return;}
+    var t0=null,dur=900;
+    function f(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/dur);var e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e);if(p<1)requestAnimationFrame(f);}
+    el.textContent='0';requestAnimationFrame(f);
+  }
+
+  /* position glyphs for the 44 s timeline */
+  var glyph={
+    top:'<svg viewBox="0 0 16 26" aria-hidden="true"><rect x=".75" y=".75" width="14.5" height="24.5" rx="3" fill="none" stroke="#7D7D9E" stroke-width="1.5"/><rect x="2.5" y="2.5" width="11" height="8" rx="1.5" fill="#01D676"/></svg>Top sheet',
+    bot:'<svg viewBox="0 0 16 26" aria-hidden="true"><rect x=".75" y=".75" width="14.5" height="24.5" rx="3" fill="none" stroke="#7D7D9E" stroke-width="1.5"/><rect x="2.5" y="11" width="11" height="12.5" rx="1.5" fill="#01D676"/></svg>Bottom sheet',
+    both:'<svg viewBox="0 0 16 26" aria-hidden="true"><rect x=".75" y=".75" width="14.5" height="24.5" rx="3" fill="none" stroke="#7D7D9E" stroke-width="1.5"/><rect x="2.5" y="2.5" width="11" height="3" rx="1" fill="#01D676"/><rect x="2.5" y="15" width="11" height="8.5" rx="1.5" fill="#01D676"/></svg>Toast + drawer'
+  };
+  [].forEach.call(document.querySelectorAll('.pos[data-p]'),function(el){el.innerHTML=glyph[el.getAttribute('data-p')];});
+
+  /* the 44 seconds */
+  var S44=[ // k = frame, row, counters after this step, direction
+    {k:0,row:0,s:0,c:0,t:0,d:''},
+    {k:1,row:1,s:1,c:1,t:0,d:'top'},
+    {k:2,row:2,s:2,c:2,t:4,d:'top'},
+    {k:3,row:3,s:3,c:3,t:8,d:'bot'},
+    {k:4,row:4,s:3,c:3,t:18,d:''},
+    {k:5,row:5,s:4,c:3,t:19,d:'bot'},
+    {k:6,row:6,s:5,c:3,t:24,d:'top'},
+    {k:7,row:7,s:6,c:3,t:26,d:'bot'},
+    {k:8,row:7,s:6,c:3,t:32,d:''},
+    {k:9,row:8,s:7,c:3,t:42,d:'bot'},
+    {k:9,row:9,s:7,c:3,t:44,d:''}
+  ];
+  var s44=document.querySelector('.s44');
+  var imgs=[].slice.call(s44.querySelectorAll('#s44scr img'));
+  var rows=[].slice.call(s44.querySelectorAll('#s44tl li'));
+  var cS=document.getElementById('c-surf'),cC=document.getElementById('c-claim'),cT=document.getElementById('c-sec');
+  function setNum(el,v){if(el.textContent!==String(v)){el.textContent=v;if(!reduce){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}}}
+  function show44(i,instant){
+    var st=S44[i];
+    imgs.forEach(function(im){var k=+im.getAttribute('data-k');
+      if(k===st.k){ if(!im.classList.contains('on')){ if(!instant&&st.d){im.classList.remove('top','bot');im.classList.add(st.d);void im.offsetWidth;} im.classList.add('on'); } }
+      else {im.classList.remove('on','top','bot');}
+    });
+    rows.forEach(function(li,j){li.classList.toggle('seen',j<=st.row);li.classList.toggle('now',j===st.row);});
+    setNum(cS,st.s);setNum(cC,st.c);setNum(cT,st.t);
+  }
+  function play44(){
+    clearTimers();
+    if(reduce){show44(S44.length-1,true);return;}
+    show44(0,true);
+    var gaps=[0,1100,900,900,1000,850,850,850,900,950,800], acc=500;
+    for(var i=1;i<S44.length;i++){acc+=gaps[i];(function(n){timers.push(setTimeout(function(){show44(n);},acc));})(i);}
+  }
+  document.getElementById('s44replay').addEventListener('click',function(e){e.stopPropagation();play44();});
+
+  function enter(sl){
+    [].forEach.call(sl.querySelectorAll('[data-to]'),countUp);
+    if(sl.getAttribute('data-anim')==='s44') play44();
+  }
+
+  function go(i,fromHash){
+    i=Math.max(0,Math.min(N-1,i)); if(i===cur) return;
+    clearTimers();
+    if(cur>=0){slides[cur].classList.remove('active','in');}
+    cur=i; var sl=slides[i];
+    sl.classList.add('active'); sl.scrollTop=0;
+    if(reduce){sl.classList.add('in');} else {requestAnimationFrame(function(){requestAnimationFrame(function(){sl.classList.add('in');});});}
+    enter(sl);
+    progress.style.width=((i+1)/N*100)+'%';
+    count.textContent=pad(i+1)+' / '+pad(N);
+    prevB.disabled=i===0; nextB.disabled=i===N-1;
+    document.title=(i===0?'':sl.getAttribute('data-title')+' · ')+'Freecash asks before it gives';
+    if(!fromHash){ if(history.replaceState) history.replaceState(null,'','#'+(i+1)); else location.hash='#'+(i+1); }
+  }
+  function next(){go(cur+1);} function prev(){go(cur-1);}
+  function fromHash(){var n=parseInt((location.hash||'').replace('#',''),10);return isNaN(n)?0:n-1;}
+
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||(k===' '&&!e.shiftKey)||k==='Enter'&&e.target===document.body){e.preventDefault();next();}
+    else if(k==='ArrowLeft'||k==='PageUp'||(k===' '&&e.shiftKey)){e.preventDefault();prev();}
+    else if(k==='Home'){e.preventDefault();go(0);} else if(k==='End'){e.preventDefault();go(N-1);}
+    else if(!root.classList.contains('m')&&(k==='ArrowDown')){e.preventDefault();next();}
+    else if(!root.classList.contains('m')&&(k==='ArrowUp')){e.preventDefault();prev();}
+  });
+  prevB.addEventListener('click',function(e){e.stopPropagation();prev();});
+  nextB.addEventListener('click',function(e){e.stopPropagation();next();});
+  document.getElementById('deck').addEventListener('click',function(e){
+    if(root.classList.contains('m')) return;
+    if(e.target.closest('a,button,.no-nav,input,label')) return;
+    if(window.getSelection&&String(window.getSelection()).length) return;
+    if(e.clientX<window.innerWidth*0.3) prev(); else next();
+  });
+  var tx=0,ty=0,tt=0;
+  document.addEventListener('touchstart',function(e){var t=e.changedTouches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();},{passive:true});
+  document.addEventListener('touchend',function(e){var t=e.changedTouches[0];var dx=t.clientX-tx,dy=t.clientY-ty;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-tt<800){ if(dx<0) next(); else prev(); }
+  },{passive:true});
+  window.addEventListener('hashchange',function(){go(fromHash(),true);});
+  var hint=document.getElementById('hint'); setTimeout(function(){hint.style.opacity=0;},4000);
+  go(fromHash(),false);
+})();
+</script>
+<style>
+/* ---------- phone reflow: single readable column ---------- */
+html.m,html.m body{overflow:hidden}
+html.m #stage{position:fixed;inset:0;left:0;top:0;width:auto;height:auto;transform:none}
+html.m .slide{padding:40px 20px 96px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;justify-content:flex-start!important}
+html.m h1,html.m .s-title h1{font-size:40px;line-height:1.12}
+html.m h2{font-size:28px;line-height:1.25;margin-bottom:20px}
+html.m .lead{font-size:18px}
+html.m .body{font-size:16px}
+html.m .small{font-size:14.5px}
+html.m .quote{font-size:17px}
+html.m .eyebrow{font-size:12px;margin-bottom:12px}
+html.m .row,html.m .who,html.m .g2,html.m .g3,html.m .ba,html.m .ba .side{display:flex;flex-direction:column;gap:20px;align-items:stretch}
+html.m .g4{grid-template-columns:1fr 1fr;gap:16px}
+html.m .grow{flex:none}
+html.m .panel{padding:18px}
+html.m .timebox{width:auto!important}
+html.m .row.textfirst{flex-direction:column-reverse}
+html.m .slide>*{flex:none!important;min-height:auto!important}
+html.m .row,html.m .ba{flex:none!important;min-height:auto!important}
+html.m a.boardbox{max-height:none}
+html.m a.boardbox img{height:auto!important}
+html.m .s-title .art{position:static;transform:none;margin-top:32px}
+html.m .s-title .art .nrcw{width:100%!important;max-width:340px}
+html.m .namecard{margin-top:28px}
+html.m .phone{align-self:center}
+html.m .phone .scr{--hh:min(var(--h),520px)}
+html.m figure.phone,html.m .phone{--h:480px!important}
+html.m figure[style*="width"]{width:auto!important;align-self:center}
+html.m .row>figure{align-self:center}
+html.m .ph-cap{max-width:260px}
+html.m .pipe{display:flex;flex-direction:column;gap:14px}
+html.m .pipe .track{display:none}
+html.m .step{flex-direction:row;gap:12px;align-items:flex-start}
+html.m .step .dot{width:36px;height:36px;font-size:12px;flex:none}
+html.m .step .tile{flex:1}
+html.m .boardbox{width:100%!important;height:auto!important;max-height:420px}
+html.m .boardbox.scroll{height:420px!important}
+html.m .stat b{font-size:34px}
+html.m .s44 .row{gap:24px}
+html.m .counters{gap:8px}
+html.m .ctr{padding:10px 10px}
+html.m .ctr b{font-size:32px}
+html.m .ctr span{font-size:12px;line-height:1.3;display:block}
+html.m .tl-head{display:none}
+html.m .tl li{grid-template-columns:58px 1fr;font-size:14px;row-gap:4px}
+html.m .tl li .pos,html.m .tl li .act{grid-column:2}
+html.m .replay{flex-wrap:wrap}
+html.m .phead{display:none}
+html.m .prow{grid-template-columns:28px 1fr;gap:6px 12px;padding:14px}
+html.m .prow .term,html.m .prow .seen{grid-column:2}
+html.m .prow .obs,html.m .prow .term{font-size:15px}
+html.m .rule h3{font-size:17px}
+html.m .rule p{font-size:14.5px}
+html.m .states{grid-template-columns:1fr;gap:28px}
+html.m .state{align-items:center}
+html.m .state .nrcw{width:300px}
+html.m .state .meta{width:300px}
+html.m .ba .fact b{font-size:32px}
+html.m .ba .facts{padding:0}
+html.m .thumbs{flex-wrap:wrap}
+html.m .nrcw[style*="width:300px"]{width:300px!important}
+html.m p[style*="font-size:46px"]{font-size:26px!important}
+html.m h1[style*="font-size:92px"]{font-size:36px!important}
+html.m .btn{height:54px;font-size:18px;padding:0 26px}
+html.m .foot{margin-top:24px}
+html.m #chrome{left:0;right:0;bottom:0;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--surface) 40%)}
+html.m #hint{display:none}
+html.m .who .panel h3{font-size:19px}
+html.m .list li{font-size:15.5px}
+html.m .tile{padding:16px}
+html.m .legend{gap:10px 14px}
+@media (prefers-reduced-motion: reduce){
+  .r,.slide,.s44 .scr img,.pipe .track i,.step .dot{transition:none!important}
+  .ctr b.bump{animation:none}
+}
+</style>
+</body>
+</html>

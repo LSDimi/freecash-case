@@ -1,0 +1,10 @@
+# Only the hosted site is tracked. Everything else in this folder stays local:
+# the recording, Almedia's PDFs, working docs, raw assets and session notes.
+/*
+!/.gitignore
+!/.nojekyll
+!/index.html
+!/presentation/
+!/prototype/
+NOTES.md
+.DS_Store
